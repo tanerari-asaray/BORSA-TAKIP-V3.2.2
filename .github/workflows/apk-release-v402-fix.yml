@@ -28,6 +28,8 @@ jobs:
         run: python3 tools/apply_stock_search.py
       - name: Apply V4 performance update
         run: python3 tools/apply_v4.py
+      - name: Apply fast data flow update
+        run: python3 tools/apply_fast_data.py
       - name: Normalize V4 imports
         run: python3 tools/fix_v4_imports.py
       - name: Add API quick access
@@ -46,6 +48,8 @@ jobs:
           test -f app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
           test ! -f app/src/main/java/tr/borsatakip/v3/MainActivityV2.kt
           grep -q 'apiQuickCard).setOnClickListener' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
+          grep -q 'parallelBatchSize = 24' app/src/main/java/tr/borsatakip/v3/market/YahooBistMarketDataProvider.kt
+          grep -q 'delay(30_000)' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
       - name: Build signed release APK
         run: gradle assembleRelease --stacktrace
       - name: Verify APK
