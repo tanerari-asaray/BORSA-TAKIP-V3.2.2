@@ -1,5 +1,5 @@
-# Borsa Takip V4.0.0
+# Borsa Takip V4.0.4 PRO
 
-Hızlı veri, paralel BIST/VİOP taraması ve performans odaklı Android uygulaması.
+Referans 8 ekran tasarım sistemi, BIST/VİOP tarama yapısı ve üretim veri kontrolleri.
 
-Build tetikleyici güncellemesi.
+APK build tetikleyicisi.
