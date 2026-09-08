@@ -1,4 +1,4 @@
-name: BORSA TAKIP V4.0.2 FINAL RELEASE
+name: BORSA TAKIP V4.0.3 RELEASE
 
 on:
   push:
@@ -40,16 +40,16 @@ jobs:
         run: python3 tools/fix_api_quick_access_v4.py
       - name: Complete V4 cleanup and release identity
         run: python3 tools/apply_v402_completion.py
-      - name: Verify V4 release configuration
+      - name: Verify full BIST + VIOP release
         run: |
-          grep -q 'versionName = "4.0.2"' app/build.gradle.kts
-          grep -q 'versionCode = 42' app/build.gradle.kts
+          grep -q 'versionName = "4.0.3"' app/build.gradle.kts
+          grep -q 'versionCode = 43' app/build.gradle.kts
           grep -q 'android:label="Borsa Takip V4"' app/src/main/AndroidManifest.xml
           test -f app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
           test ! -f app/src/main/java/tr/borsatakip/v3/MainActivityV2.kt
-          grep -q 'apiQuickCard).setOnClickListener' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
+          grep -q 'Market.VIOP' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
+          grep -q 'Market.BIST' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
           grep -q 'parallelBatchSize = 24' app/src/main/java/tr/borsatakip/v3/market/YahooBistMarketDataProvider.kt
-          grep -q 'delay(30_000)' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
       - name: Build signed release APK
         run: gradle assembleRelease --stacktrace
       - name: Verify APK
@@ -59,6 +59,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BORSA-TAKIP-V4.0.2-FINAL-RELEASE
+          name: BORSA-TAKIP-V4.0.3-FULL-BIST-VIOP
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
