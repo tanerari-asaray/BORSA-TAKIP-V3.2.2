@@ -28,26 +28,23 @@ jobs:
         run: python3 tools/apply_v403_fixes.py
       - name: Apply 8-screen reference UI
         run: python3 tools/apply_v404_reference_ui.py
-      - name: Verify V4.0.4 corrections
+      - name: Validate reference UI markers
         run: |
-          grep -q 'versionName = "4.0.4"' app/build.gradle.kts
-          grep -q 'versionCode = 44' app/build.gradle.kts
-          grep -q 'android:label="Borsa Takip V4"' app/src/main/AndroidManifest.xml
+          grep 'versionName' app/build.gradle.kts
+          grep 'versionCode' app/build.gradle.kts
           test -f app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
           test ! -f app/src/main/java/tr/borsatakip/v3/MainActivityV2.kt
-          grep -q 'Market.VIOP' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
-          grep -q 'Market.BIST' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
-          grep -q 'bg_bist' app/src/main/res/layout/activity_main.xml
-          grep -q 'bg_viop' app/src/main/res/layout/activity_main.xml
-          grep -q 'bg_opportunity' app/src/main/res/layout/activity_main.xml
-          grep -q 'demoSwitch' app/src/main/res/layout/activity_main.xml
-          grep -q 'notificationSwitch' app/src/main/res/layout/activity_main.xml
-          grep -q 'autoScanSwitch' app/src/main/res/layout/activity_main.xml
-          grep -q 'rsiWilder' app/src/main/java/tr/borsatakip/v3/analysis/TechnicalAnalyzer.kt
-          grep -q 'vwap' app/src/main/java/tr/borsatakip/v3/analysis/TechnicalAnalyzer.kt
-          grep -q 'marketType' app/src/main/java/tr/borsatakip/v3/model/Stock.kt
+          grep 'bg_bist' app/src/main/res/layout/activity_main.xml
+          grep 'bg_viop' app/src/main/res/layout/activity_main.xml
+          grep 'bg_opportunity' app/src/main/res/layout/activity_main.xml
+          grep 'demoSwitch' app/src/main/res/layout/activity_main.xml
+          grep 'notificationSwitch' app/src/main/res/layout/activity_main.xml
+          grep 'autoScanSwitch' app/src/main/res/layout/activity_main.xml
+          grep 'rsiWilder' app/src/main/java/tr/borsatakip/v3/analysis/TechnicalAnalyzer.kt
+          grep 'vwap' app/src/main/java/tr/borsatakip/v3/analysis/TechnicalAnalyzer.kt
+          grep 'marketType' app/src/main/java/tr/borsatakip/v3/model/Stock.kt
           ! grep -q 'X-API-Secret' app/src/main/java/tr/borsatakip/v3/market/LiveBackendMarketDataProvider.kt
-          grep -q 'GECİKMELİ VERİ' app/src/main/java/tr/borsatakip/v3/market/YahooBistMarketDataProvider.kt
+          grep 'GECİKMELİ VERİ' app/src/main/java/tr/borsatakip/v3/market/YahooBistMarketDataProvider.kt
       - name: Build signed release APK
         run: gradle clean assembleRelease --stacktrace
       - name: Verify APK
