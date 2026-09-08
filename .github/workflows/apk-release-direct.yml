@@ -26,6 +26,8 @@ jobs:
         run: python3 tools/apply_stock_search.py
       - name: Apply V4 performance update
         run: python3 tools/apply_v4.py
+      - name: Normalize V4 imports
+        run: python3 tools/fix_v4_imports.py
       - name: Build debug APK
         run: gradle assembleDebug --stacktrace
       - name: Upload APK
