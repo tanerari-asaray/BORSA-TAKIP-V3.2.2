@@ -14,46 +14,39 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
-/** BIST için gerçek günlük OHLCV verisi. Demo/sahte veri üretmez. */
+/**
+ * BIST geniş evreni için gerçek OHLCV verisi. Demo/sahte veri üretmez.
+ * Yahoo'nun BIST (.IS) veri akışı piyasa verisi sağlayıcısı olarak kullanılır;
+ * Yahoo'nun kendi yardım sayfasına göre Borsa İstanbul verisi en az 15 dakika gecikmelidir.
+ */
 class YahooBistMarketDataProvider(private val context: Context) {
     private val timeoutMs = 8_000
-
-    private val bist30 = listOf(
-        "AEFES", "AKBNK", "ASELS", "ASTOR", "BIMAS", "DSTKF", "EKGYO", "ENKAI", "EREGL", "FROTO",
-        "GARAN", "GUBRF", "ISCTR", "KCHOL", "KRDMD", "MGROS", "PETKM", "PGSUS", "SAHOL", "SASA",
-        "SISE", "TAVHL", "TCELL", "THYAO", "TOASO", "TRALT", "TTKOM", "TUPRS", "VAKBN", "YKBNK"
-    )
 
     suspend fun load(): Result<MarketDataResult> = withContext(Dispatchers.IO) {
         runCatching {
             val watchlist = context.getSharedPreferences("watchlist", Context.MODE_PRIVATE)
                 .getStringSet("symbols", emptySet())
                 ?.map { it.trim().uppercase() }
-                ?.filter { it.matches(Regex("[A-Z0-9]{3,6}")) }
+                ?.filter { it.matches(Regex("[A-Z0-9]{3,7}")) }
                 ?: emptyList()
-            val symbols = (bist30 + watchlist).distinct().take(50)
+            val symbols = (BistUniverse.symbols + watchlist).distinct()
 
-            // BIST100 benchmark verisi bulunursa göreceli güç ve piyasa rejimi gerçek veriden hesaplanır.
-            // Alınamazsa alanlar null kalır; kesinlikle değer uydurulmaz.
             val benchmark = fetchYahooStock("XU100.IS", "XU100")
             val benchmarkReturn20d = benchmark?.let { return20d(it.candles) }
             val marketRegime = benchmark?.let { determineMarketRegime(it) }
 
             val stocks = coroutineScope {
-                symbols.chunked(6).flatMap { batch ->
+                symbols.chunked(12).flatMap { batch ->
                     batch.map { symbol -> async { fetchStock(symbol) } }.awaitAll().filterNotNull()
                 }
             }.map { stock ->
-                stock.copy(
-                    benchmarkReturn20d = benchmarkReturn20d,
-                    marketRegime = marketRegime
-                )
+                stock.copy(benchmarkReturn20d = benchmarkReturn20d, marketRegime = marketRegime)
             }
 
-            require(stocks.isNotEmpty()) { "Yahoo Finance BIST için geçerli veri döndürmedi." }
+            require(stocks.isNotEmpty()) { "BIST geniş evreni için geçerli veri döndürülmedi." }
             MarketDataResult(
                 items = stocks,
-                sourceName = "Yahoo Finance • BIST 30 + Takip Listesi",
+                sourceName = "Yahoo Finance • BIST geniş evren + Takip Listesi",
                 dataTimestamp = stocks.maxOf { it.dataTimestamp },
                 isDemo = false
             )
@@ -70,7 +63,8 @@ class YahooBistMarketDataProvider(private val context: Context) {
             connectTimeout = timeoutMs
             readTimeout = timeoutMs
             setRequestProperty("Accept", "application/json")
-            setRequestProperty("User-Agent", "Mozilla/5.0 (Android) BorsaTakipV3/3.2.6")
+            setRequestProperty("Cache-Control", "no-cache")
+            setRequestProperty("User-Agent", "Mozilla/5.0 (Android) BorsaTakipV4/4.0.2")
         }
         return try {
             if (connection.responseCode !in 200..299) return null
@@ -105,13 +99,10 @@ class YahooBistMarketDataProvider(private val context: Context) {
             if (listOf(open, high, low, close, volume).any { it.isNaN() || it.isInfinite() }) continue
             candles.add(Candle(timestamps.getLong(i) * 1000L, open, high, low, close, volume))
         }
-        if (candles.size < 30) return null
+        if (candles.size < 50) return null
 
         val meta = result.optJSONObject("meta")
-        val displaySymbol = meta?.optString("symbol")
-            ?.removeSuffix(".IS")
-            ?.takeIf { it.isNotBlank() }
-            ?: fallbackSymbol
+        val displaySymbol = meta?.optString("symbol")?.removeSuffix(".IS")?.takeIf { it.isNotBlank() } ?: fallbackSymbol
         val companyName = meta?.optString("longName")?.takeIf { it.isNotBlank() }
         return Stock(
             symbol = displaySymbol,
