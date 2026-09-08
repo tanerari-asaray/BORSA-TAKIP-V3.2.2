@@ -1,4 +1,4 @@
-name: APK V4.0.4 REFERENCE UI RELEASE
+name: APK V4.0.5 INSTALLABLE RELEASE
 
 on:
   push:
@@ -28,15 +28,49 @@ jobs:
         run: python3 tools/apply_v403_fixes.py
       - name: Apply 8-screen reference UI
         run: python3 tools/apply_v404_reference_ui.py
-      - name: Build signed release APK
+      - name: Build release APK
         run: gradle clean assembleRelease --stacktrace
-      - name: Verify APK
+      - name: Align and sign APK with Android APK Signature Scheme
+        shell: bash
         run: |
-          test -f app/build/outputs/apk/release/app-release.apk
-          jarsigner -verify app/build/outputs/apk/release/app-release.apk
+          set -euo pipefail
+          APK="app/build/outputs/apk/release/app-release.apk"
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$HOME/Android/Sdk}}"
+          ZIPALIGN="$(find "$SDK_ROOT/build-tools" -type f -name zipalign | sort -V | tail -n 1)"
+          APKSIGNER="$(find "$SDK_ROOT/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          test -x "$ZIPALIGN"
+          test -x "$APKSIGNER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          "$ZIPALIGN" -f 4 "$APK" "${APK%.apk}-aligned.apk"
+          mv "${APK%.apk}-aligned.apk" "$APK"
+          "$APKSIGNER" sign \
+            --ks "$HOME/.android/debug.keystore" \
+            --ks-pass pass:android \
+            --ks-key-alias androiddebugkey \
+            --key-pass pass:android \
+            --out "${APK%.apk}-signed.apk" "$APK"
+          mv "${APK%.apk}-signed.apk" "$APK"
+      - name: Verify APK signature and package
+        run: |
+          set -euo pipefail
+          APK="app/build/outputs/apk/release/app-release.apk"
+          test -f "$APK"
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$HOME/Android/Sdk}}"
+          APKSIGNER="$(find "$SDK_ROOT/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+          jarsigner -verify "$APK"
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BORSA-TAKIP-V4.0.4-REFERENCE-UI
+          name: BORSA-TAKIP-V4.0.5-INSTALLABLE
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
