@@ -7,10 +7,12 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import tr.borsatakip.v3.analysis.TechnicalAnalyzer
 import tr.borsatakip.v3.model.Candle
 import tr.borsatakip.v3.model.Stock
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 
 /** BIST için gerçek günlük OHLCV verisi. Demo/sahte veri üretmez. */
 class YahooBistMarketDataProvider(private val context: Context) {
@@ -30,11 +32,24 @@ class YahooBistMarketDataProvider(private val context: Context) {
                 ?.filter { it.matches(Regex("[A-Z0-9]{3,6}")) }
                 ?: emptyList()
             val symbols = (bist30 + watchlist).distinct().take(50)
+
+            // BIST100 benchmark verisi bulunursa göreceli güç ve piyasa rejimi gerçek veriden hesaplanır.
+            // Alınamazsa alanlar null kalır; kesinlikle değer uydurulmaz.
+            val benchmark = fetchYahooStock("XU100.IS", "XU100")
+            val benchmarkReturn20d = benchmark?.let { return20d(it.candles) }
+            val marketRegime = benchmark?.let { determineMarketRegime(it) }
+
             val stocks = coroutineScope {
                 symbols.chunked(6).flatMap { batch ->
                     batch.map { symbol -> async { fetchStock(symbol) } }.awaitAll().filterNotNull()
                 }
+            }.map { stock ->
+                stock.copy(
+                    benchmarkReturn20d = benchmarkReturn20d,
+                    marketRegime = marketRegime
+                )
             }
+
             require(stocks.isNotEmpty()) { "Yahoo Finance BIST için geçerli veri döndürmedi." }
             MarketDataResult(
                 items = stocks,
@@ -45,18 +60,21 @@ class YahooBistMarketDataProvider(private val context: Context) {
         }
     }
 
-    private fun fetchStock(symbol: String): Stock? {
-        val url = URL("https://query1.finance.yahoo.com/v8/finance/chart/${symbol}.IS?range=1y&interval=1d&events=history")
+    private fun fetchStock(symbol: String): Stock? = fetchYahooStock("${symbol}.IS", symbol)
+
+    private fun fetchYahooStock(yahooSymbol: String, fallbackSymbol: String): Stock? {
+        val encoded = URLEncoder.encode(yahooSymbol, "UTF-8")
+        val url = URL("https://query1.finance.yahoo.com/v8/finance/chart/$encoded?range=1y&interval=1d&events=history")
         val connection = (url.openConnection() as HttpURLConnection).apply {
             requestMethod = "GET"
             connectTimeout = timeoutMs
             readTimeout = timeoutMs
             setRequestProperty("Accept", "application/json")
-            setRequestProperty("User-Agent", "Mozilla/5.0 (Android) BorsaTakipV3/3.2.4")
+            setRequestProperty("User-Agent", "Mozilla/5.0 (Android) BorsaTakipV3/3.2.6")
         }
         return try {
             if (connection.responseCode !in 200..299) return null
-            parseStock(connection.inputStream.bufferedReader().use { it.readText() }, symbol)
+            parseStock(connection.inputStream.bufferedReader().use { it.readText() }, fallbackSymbol)
         } catch (_: Exception) {
             null
         } finally {
@@ -90,7 +108,10 @@ class YahooBistMarketDataProvider(private val context: Context) {
         if (candles.size < 30) return null
 
         val meta = result.optJSONObject("meta")
-        val displaySymbol = meta?.optString("symbol")?.removeSuffix(".IS")?.takeIf { it.isNotBlank() } ?: fallbackSymbol
+        val displaySymbol = meta?.optString("symbol")
+            ?.removeSuffix(".IS")
+            ?.takeIf { it.isNotBlank() }
+            ?: fallbackSymbol
         val companyName = meta?.optString("longName")?.takeIf { it.isNotBlank() }
         return Stock(
             symbol = displaySymbol,
@@ -100,5 +121,23 @@ class YahooBistMarketDataProvider(private val context: Context) {
             bedelsizPercent = null,
             isDemo = false
         )
+    }
+
+    private fun return20d(candles: List<Candle>): Double? {
+        if (candles.size < 21) return null
+        val start = candles[candles.lastIndex - 20].close
+        val end = candles.last().close
+        if (start <= 0.0) return null
+        return (end / start - 1.0) * 100.0
+    }
+
+    private fun determineMarketRegime(stock: Stock): String {
+        val t = TechnicalAnalyzer.analyze(stock.candles)
+        val price = stock.candles.last().close
+        return when {
+            t.ema20 != null && t.ema50 != null && price > t.ema20 && t.ema20 > t.ema50 -> "BULL"
+            t.ema20 != null && t.ema50 != null && price < t.ema20 && t.ema20 < t.ema50 -> "BEAR"
+            else -> "NEUTRAL"
+        }
     }
 }
