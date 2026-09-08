@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -67,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             binding.statusText.text="VERİ ALINIYOR..."; binding.progressBar.progress=15
             provider.loadMarket(market).onSuccess { result ->
                 binding.statusText.text="${result.items.size} kayıt alındı. TARANIYOR..."; binding.progressBar.progress=45
-                val all=result.items.mapNotNull(scoring::score); binding.statusText.text="ANALİZ EDİLİYOR..."; binding.progressBar.progress=75
+                val all=withContext(Dispatchers.Default){result.items.mapNotNull(scoring::score)}; binding.statusText.text="ANALİZ EDİLİYOR..."; binding.progressBar.progress=75
                 finishSuccess(all.filter{it.direction!="SİNYAL YOK"&&it.score>=70}.sortedByDescending{it.score},result.dataTimestamp,result.sourceName)
             }.onFailure(::finishFailure)
         }
@@ -77,22 +79,24 @@ class MainActivity : AppCompatActivity() {
         if (scanJob?.isActive == true) return
         beginScanUi(ScanButton.OPPORTUNITY,"FIRSAT KONTROLÜ"); selectNav(1)
         scanJob=lifecycleScope.launch {
-            binding.statusText.text="BIST VERİLERİ ALINIYOR..."; binding.progressBar.progress=15
+            binding.statusText.text="BIST + VİOP VERİLERİ AYNI ANDA ALINIYOR..."; binding.progressBar.progress=10
             try {
-                val b=provider.loadMarket(Market.BIST).getOrElse{throw it}
-                binding.statusText.text="BIST FIRSATLARI TARANIYOR..."; binding.progressBar.progress=50
-                val rows=b.items.mapNotNull(scoring::score); binding.progressBar.progress=80
+                val (br,vr)=coroutineScope { async { provider.loadMarket(Market.BIST) } to async { provider.loadMarket(Market.VIOP) } }
+                val b=br.await().getOrElse{throw it}; binding.progressBar.progress=50
+                val v=vr.await().getOrElse{throw it}; binding.progressBar.progress=65
+                binding.statusText.text="BIST + VİOP ANALİZ EDİLİYOR..."
+                val rows=withContext(Dispatchers.Default){(b.items+v.items).mapNotNull(scoring::score)}
                 val visible=rows.filter{it.direction!="SİNYAL YOK"&&it.score>=70}.sortedByDescending{it.score}
-                finishSuccess(visible,b.dataTimestamp,"${b.sourceName} • Fırsat Kontrolü",false)
+                finishSuccess(visible,maxOf(b.dataTimestamp,v.dataTimestamp),listOf(b.sourceName,v.sourceName).distinct().joinToString(" + "),true)
             } catch(t:Throwable){finishFailure(t)}
         }
     }
 
-    private fun beginScanUi(button:ScanButton,title:String){adapter.submitList(emptyList());showContent();binding.titleText.text=title;binding.subtitleText.text="Yeni tarama başlatıldı";binding.progressBar.visibility=View.VISIBLE;binding.progressBar.progress=5;binding.statusText.text="VERİ ALINIYOR...";setButtonsEnabled(false);when(button){ScanButton.BIST->binding.btnBistTitle.text="⟳ TARANIYOR...";ScanButton.OPPORTUNITY->binding.btnOpportunityTitle.text="⟳ TARANIYOR...";ScanButton.VIOP->binding.btnViopTitle.text="⟳ TARANIYOR..."}}
+    private fun beginScanUi(button:ScanButton,title:String){showContent();binding.titleText.text=title;binding.subtitleText.text="Yeni tarama başlatıldı";binding.progressBar.visibility=View.VISIBLE;binding.progressBar.progress=5;binding.statusText.text="VERİ ALINIYOR...";setButtonsEnabled(false);when(button){ScanButton.BIST->binding.btnBistTitle.text="⟳ TARANIYOR...";ScanButton.OPPORTUNITY->binding.btnOpportunityTitle.text="⟳ TARANIYOR...";ScanButton.VIOP->binding.btnViopTitle.text="⟳ TARANIYOR..."}}
 
     private fun finishSuccess(visible:List<Opportunity>,dataTimestamp:Long,sourceName:String,combined:Boolean=false){binding.progressBar.progress=100;adapter.submitList(visible);val now=System.currentTimeMillis();binding.subtitleText.text="${freshnessLabel(dataTimestamp)} • $sourceName";binding.statusText.text=buildString{append("Tarama tamamlandı\nSon güncelleme: ${formatTime(now)}\nVeri zamanı: ${formatTime(dataTimestamp)}\n${if(combined)"BIST + VİOP" else "Piyasa"} güçlü fırsat sayısı: ${visible.size}");if(visible.isEmpty())append("\n\nŞu anda 70 puan üzeri güçlü LONG/SHORT fırsatı bulunamadı.")};binding.lastScanHome.text="Son tarama: ${formatTime(now)}";restoreButtons();scanJob=null}
 
-    private fun finishFailure(error:Throwable){adapter.submitList(emptyList());binding.progressBar.progress=0;binding.subtitleText.text="VERİ ALINAMADI";binding.statusText.text=userFacingError(error);restoreButtons();scanJob=null}
+    private fun finishFailure(error:Throwable){binding.progressBar.progress=0;binding.subtitleText.text="VERİ ALINAMADI";binding.statusText.text=userFacingError(error);restoreButtons();scanJob=null}
     private fun userFacingError(error:Throwable):String{val root=generateSequence(error){it.cause}.last();return when(root){is UnknownHostException->"İnternet bağlantısı bulunamadı.";is SocketTimeoutException->"Veri sağlayıcısından yanıt alınamadı.";else->when{root.message?.contains("backend adresi",true)==true->"Gerçek piyasa veri kaynağı yapılandırılmamış.";root.message?.contains("geçerli piyasa",true)==true->"Tarama için kullanılabilir güncel veri bulunamadı.";else->"Piyasa verisi alınamadı."}}+"\n\nEski veya demo sonuç gösterilmedi."}
 
     private fun showDetail(item:Opportunity){showContent();binding.titleText.text=item.symbol;binding.subtitleText.text="Hisse/Sözleşme Detayı • ${freshnessLabel(item.dataTimestamp)}";binding.progressBar.visibility=View.GONE;adapter.submitList(emptyList());binding.statusText.text=buildString{append("Son Fiyat   ${fmt(item.price)}     Skor   ${item.score}/100\nYön: ${item.direction}    Sınıf: ${item.confidence}\nVeri zamanı: ${formatTime(item.dataTimestamp)}\n\nTeknik Analiz\nRSI14: ${fmtOrNA(item.technical.rsi14)}\nMACD: ${fmtOrNA(item.technical.macd)}   Sinyal: ${fmtOrNA(item.technical.macdSignal)}\nEMA20: ${fmtOrNA(item.technical.ema20)}   EMA50: ${fmtOrNA(item.technical.ema50)}   EMA200: ${fmtOrNA(item.technical.ema200)}\nATR14: ${fmtOrNA(item.technical.atr14)}   Hacim: ${item.technical.volumeRatio?.let{fmt(it)+"x"}?:"Veri yetersiz"}\nDestek: ${fmtOrNA(item.technical.support)}   Direnç: ${fmtOrNA(item.technical.resistance)}\n\nGiriş: ${item.entry?.let(::fmt)?:"Veri yetersiz"}\nStop: ${item.stop?.let(::fmt)?:"Veri yetersiz"}\nHedef 1: ${item.target1?.let(::fmt)?:"Veri yetersiz"}\nHedef 2: ${item.target2?.let(::fmt)?:"Veri yetersiz"}\nRisk/Getiri: ${item.riskReward?.let{"1:${fmt(it)}"}?:"Veri yetersiz"}\n\nSkor bileşenleri\n");item.breakdown.forEach{append("${it.name}: ${it.points}/${it.maxPoints}\n")};append("\nBu analiz yatırım tavsiyesi değildir.")}}

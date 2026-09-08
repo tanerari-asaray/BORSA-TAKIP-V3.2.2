@@ -23,9 +23,10 @@ class LiveBackendMarketDataProvider(private val context: Context) : MarketDataPr
             val path = if (market == Market.BIST) "/api/v1/market/bist" else "/api/v1/market/viop"
             val connection = (URL(base + path).openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
-                connectTimeout = 10_000
-                readTimeout = 20_000
+                connectTimeout = 5_000
+                readTimeout = 8_000
                 setRequestProperty("Accept", "application/json")
+                setRequestProperty("Cache-Control", "no-cache")
                 if (apiKey.isNotBlank()) {
                     setRequestProperty("Authorization", "Bearer $apiKey")
                     setRequestProperty("X-API-Key", apiKey)

@@ -1,5 +1,5 @@
-# Borsa Takip V3.2.8
+# Borsa Takip V4.0.0
 
-API ayarları ve seçici Fırsat Kontrolü teknik motoru bulunan Android uygulaması.
+Hızlı veri, paralel BIST/VİOP taraması ve performans odaklı Android uygulaması.
 
 Build tetikleyici güncellemesi.
