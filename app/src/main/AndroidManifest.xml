@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <application android:allowBackup="true" android:usesCleartextTraffic="false" android:label="Borsa Takip V3" android:supportsRtl="true" android:theme="@style/Theme.BorsaTakipV3">
-        <activity android:name=".MainActivityV2" android:exported="true" android:screenOrientation="portrait">
+    <application android:allowBackup="true" android:usesCleartextTraffic="false" android:label="Borsa Takip V4" android:supportsRtl="true" android:theme="@style/Theme.BorsaTakipV3">
+        <activity android:name=".MainActivityV4" android:exported="true" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
