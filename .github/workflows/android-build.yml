@@ -5,6 +5,9 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,11 +23,22 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Apply watchlist update
+        run: python3 tools/apply_watchlist.py
+      - name: Persist watchlist update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add app/src/main/java/tr/borsatakip/v3/MainActivity.kt app/src/main/res/layout/activity_main.xml
+            git commit -m "Add persistent stock watchlist [skip ci]"
+            git push
+          fi
       - name: Build debug APK
         run: gradle assembleDebug --stacktrace
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BORSA-TAKIP-V3.2.3-APK
+          name: BORSA-TAKIP-V3.2.4-TAKIP-LISTESI
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
