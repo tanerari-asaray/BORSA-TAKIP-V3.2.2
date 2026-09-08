@@ -24,7 +24,7 @@ private fun addWatchSymbol(){val input=android.widget.EditText(this);input.hint=
 private fun removeWatchSymbol(symbol:String){val prefs=getSharedPreferences("watchlist",MODE_PRIVATE);val set=prefs.getStringSet("symbols",emptySet())?.toMutableSet()?:mutableSetOf();set.remove(symbol);prefs.edit().putStringSet("symbols",set).apply();renderWatchlist()}
 private fun clearWatchlist(){getSharedPreferences("watchlist",MODE_PRIVATE).edit().clear().apply();renderWatchlist()}
 '''
-    methods = methods.replace('\\"','"')
+    methods = methods.replace(chr(92) + '"', '"')
     if marker not in s:
         raise SystemExit('showInfo marker not found')
     s = s.replace(marker, methods + marker)
