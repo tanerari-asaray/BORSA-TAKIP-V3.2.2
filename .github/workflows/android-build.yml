@@ -27,15 +27,13 @@ jobs:
         run: python3 tools/apply_watchlist.py
       - name: Apply stock search update
         run: python3 tools/apply_stock_search.py
-      - name: Fix opportunity control
-        run: python3 tools/fix_opportunity_control.py
       - name: Persist app updates
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if ! git diff --quiet; then
             git add app/src/main/java/tr/borsatakip/v3/MainActivity.kt app/src/main/res/layout/activity_main.xml
-            git commit -m "Fix opportunity control [skip ci]"
+            git commit -m "Persist app UI updates [skip ci]"
             git push
           fi
       - name: Build debug APK
@@ -43,6 +41,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BORSA-TAKIP-V3.2.6-FIRSAT-KONTROL
+          name: BORSA-TAKIP-V3.2.8-FIRSAT-SARTLARI
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
