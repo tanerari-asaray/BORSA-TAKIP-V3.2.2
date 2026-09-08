@@ -1,0 +1,3 @@
+<resources>
+<color name="bg">#01192D</color><color name="nav_bg">#02121F</color><color name="surface">#092033</color><color name="border">#174662</color><color name="primary">#18A5FF</color><color name="green">#00C875</color><color name="yellow">#FFC53D</color><color name="orange">#FF8A1F</color><color name="red">#FF4055</color><color name="purple">#7452FF</color><color name="text_primary">#F4F7FB</color><color name="text_secondary">#A7B5C8</color><color name="text_muted">#8294AA</color>
+</resources>
