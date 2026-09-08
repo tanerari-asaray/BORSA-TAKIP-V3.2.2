@@ -11,10 +11,8 @@ android {
         applicationId = "tr.borsatakip.v3"
         minSdk = 26
         targetSdk = 35
-        versionCode = 7
-        versionName = "3.2.7"
-
-        // Intentionally empty: the live API endpoint is entered in API AYARLARI.
+        versionCode = 9
+        versionName = "3.2.9"
         buildConfigField("String", "MARKET_API_BASE_URL", "\"\"")
     }
 
@@ -30,9 +28,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
     kotlinOptions { jvmTarget = "17" }
-
     buildFeatures {
         viewBinding = true
         buildConfig = true
