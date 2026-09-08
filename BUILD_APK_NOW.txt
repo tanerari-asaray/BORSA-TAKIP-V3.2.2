@@ -1,1 +1,1 @@
-Direct APK workflow added at .github/workflows/apk-release-direct.yml. Artifact: BORSA-TAKIP-V3.2.7-FIRSAT-SARTLARI
+V4.0.3 FULL BIST + VIOP rebuild trigger 2026-09-08. Use current source and generate current BIST universe.
