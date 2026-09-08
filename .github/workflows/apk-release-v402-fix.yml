@@ -40,7 +40,9 @@ jobs:
         run: python3 tools/fix_api_quick_access_v4.py
       - name: Complete V4 cleanup and release identity
         run: python3 tools/apply_v402_completion.py
-      - name: Verify full BIST + VIOP release
+      - name: Apply V4.0.3 production fixes
+        run: python3 tools/apply_v403_fixes.py
+      - name: Verify V4.0.3 corrections
         run: |
           grep -q 'versionName = "4.0.3"' app/build.gradle.kts
           grep -q 'versionCode = 43' app/build.gradle.kts
@@ -49,7 +51,11 @@ jobs:
           test ! -f app/src/main/java/tr/borsatakip/v3/MainActivityV2.kt
           grep -q 'Market.VIOP' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
           grep -q 'Market.BIST' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
-          grep -q 'parallelBatchSize = 24' app/src/main/java/tr/borsatakip/v3/market/YahooBistMarketDataProvider.kt
+          grep -q 'rsiWilder' app/src/main/java/tr/borsatakip/v3/analysis/TechnicalAnalyzer.kt
+          grep -q 'vwap' app/src/main/java/tr/borsatakip/v3/analysis/TechnicalAnalyzer.kt
+          grep -q 'marketType' app/src/main/java/tr/borsatakip/v3/model/Stock.kt
+          ! grep -q 'X-API-Secret' app/src/main/java/tr/borsatakip/v3/market/LiveBackendMarketDataProvider.kt
+          grep -q 'GECİKMELİ VERİ' app/src/main/java/tr/borsatakip/v3/market/YahooBistMarketDataProvider.kt
       - name: Build signed release APK
         run: gradle assembleRelease --stacktrace
       - name: Verify APK
