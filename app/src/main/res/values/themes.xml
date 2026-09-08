@@ -1,0 +1,3 @@
+<resources>
+<style name="Theme.BorsaTakipV3" parent="Theme.MaterialComponents.DayNight.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:windowLightStatusBar">false</item><item name="android:statusBarColor">#02121F</item><item name="android:navigationBarColor">#02121F</item><item name="android:colorAccent">#18A5FF</item><item name="colorPrimary">#159CFF</item><item name="colorPrimaryVariant">#0754C7</item><item name="colorOnPrimary">#F4F7FB</item><item name="android:windowBackground">#01192D</item></style>
+</resources>
