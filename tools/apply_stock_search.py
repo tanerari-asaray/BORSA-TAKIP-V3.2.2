@@ -12,15 +12,20 @@ input.inputType=android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType
 input.threshold=0
 input.setAdapter(android.widget.ArrayAdapter(this,android.R.layout.simple_dropdown_item_1line,symbols))
 input.setOnFocusChangeListener{_,hasFocus->if(hasFocus){input.post{input.showDropDown()}}}
-input.setOnClickListener{input.showDropDown()}
+input.setOnClickListener{input.post{input.showDropDown()}}
+input.addTextChangedListener(object:android.text.TextWatcher{
+override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){}
+override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){input.post{input.showDropDown()}}
+override fun afterTextChanged(s:android.text.Editable?){}
+})
 input.setOnItemClickListener{_,_,position,_->input.setText(input.adapter.getItem(position).toString());input.setSelection(input.text.length);input.dismissDropDown()}
-val dialog=android.app.AlertDialog.Builder(this).setTitle("Takip Listesine Hisse Ekle").setMessage("Hisse kutusuna dokunduğunuzda kod listesi otomatik açılır. Yazdıkça liste anında filtrelenir.").setView(input).setNegativeButton("İPTAL",null).setPositiveButton("EKLE"){_,_->val symbol=input.text.toString().trim().uppercase(Locale("tr","TR"));if(symbol.isBlank())return@setPositiveButton;val prefs=getSharedPreferences("watchlist",MODE_PRIVATE);val set=prefs.getStringSet("symbols",emptySet())?.toMutableSet()?:mutableSetOf();set.add(symbol);prefs.edit().putStringSet("symbols",set).apply();renderWatchlist()}.create()
-dialog.setOnShowListener{input.requestFocus();input.post{input.showDropDown()};dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)}
+val dialog=android.app.AlertDialog.Builder(this).setTitle("Takip Listesine Hisse Ekle").setView(input).setNegativeButton("İPTAL",null).setPositiveButton("EKLE"){_,_->val symbol=input.text.toString().trim().uppercase(Locale("tr","TR"));if(symbol.isBlank())return@setPositiveButton;val prefs=getSharedPreferences("watchlist",MODE_PRIVATE);val set=prefs.getStringSet("symbols",emptySet())?.toMutableSet()?:mutableSetOf();set.add(symbol);prefs.edit().putStringSet("symbols",set).apply();renderWatchlist()}.create()
+dialog.setOnShowListener{input.requestFocus();dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);input.postDelayed({input.showDropDown()},250)}
 dialog.show()
 }
 '''
 new_method = new_method.replace('\\"','"')
 s = re.sub(r'private fun addWatchSymbol\(\)\{.*?\nprivate fun removeWatchSymbol', new_method + 'private fun removeWatchSymbol', s, count=1, flags=re.S)
-if 'input.threshold=0' not in s:
+if 'input.showDropDown()' not in s:
     raise SystemExit('stock search replacement failed')
 p.write_text(s)
