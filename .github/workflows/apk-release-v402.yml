@@ -1,4 +1,4 @@
-name: APK V4.0.2 Direct Build
+name: APK V4.0.3 FULL BIST VIOP RELEASE
 
 on:
   push:
@@ -20,36 +20,28 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Generate current broad BIST universe
+      - name: Generate current full BIST universe
         run: python3 tools/generate_bist_universe.py
-      - name: Apply watchlist update
-        run: python3 tools/apply_watchlist.py
-      - name: Apply stock search update
-        run: python3 tools/apply_stock_search.py
-      - name: Apply V4 performance update
-        run: python3 tools/apply_v4.py
-      - name: Apply fast data flow update
-        run: python3 tools/apply_fast_data.py
-      - name: Normalize V4 imports
-        run: python3 tools/fix_v4_imports.py
-      - name: Add API quick access
-        run: python3 tools/apply_api_quick_access.py
-      - name: Fix API quick access syntax
-        run: python3 tools/fix_api_quick_access.py
-      - name: Fix API quick access on V4 launcher source
-        run: python3 tools/fix_api_quick_access_v4.py
-      - name: Complete V4 cleanup and release identity
+      - name: Apply V4 release identity and cleanup
         run: python3 tools/apply_v402_completion.py
+      - name: Verify full BIST + VIOP configuration
+        run: |
+          grep -q 'versionName = "4.0.3"' app/build.gradle.kts
+          grep -q 'versionCode = 43' app/build.gradle.kts
+          test -f app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
+          test ! -f app/src/main/java/tr/borsatakip/v3/MainActivityV2.kt
+          grep -q 'Market.VIOP' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
+          grep -q 'Market.BIST' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
+          grep -q 'BistUniverse' app/src/main/java/tr/borsatakip/v3/market/YahooBistMarketDataProvider.kt
       - name: Build signed release APK
         run: gradle assembleRelease --stacktrace
       - name: Verify APK
         run: |
           test -f app/build/outputs/apk/release/app-release.apk
-          grep -q 'parallelBatchSize = 24' app/src/main/java/tr/borsatakip/v3/market/YahooBistMarketDataProvider.kt
-          grep -q 'apiQuickCard).setOnClickListener' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
+          jarsigner -verify app/build/outputs/apk/release/app-release.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BORSA-TAKIP-V4.0.2-FAST-DATA-RELEASE
+          name: BORSA-TAKIP-V4.0.3-FULL-BIST-VIOP
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
