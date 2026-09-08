@@ -1,4 +1,4 @@
-name: APK Direct Build
+name: APK V4.0.3 DEBUG FULL BIST VIOP
 
 on:
   push:
@@ -20,19 +20,20 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Apply watchlist update
-        run: python3 tools/apply_watchlist.py
-      - name: Apply stock search update
-        run: python3 tools/apply_stock_search.py
-      - name: Apply V4 performance update
-        run: python3 tools/apply_v4.py
-      - name: Normalize V4 imports
-        run: python3 tools/fix_v4_imports.py
+      - name: Generate current full BIST universe
+        run: python3 tools/generate_bist_universe.py
+      - name: Fix generated launcher identity
+        run: python3 tools/apply_v402_completion.py
+      - name: Verify BIST + VIOP
+        run: |
+          grep -q 'versionName = "4.0.3"' app/build.gradle.kts
+          grep -q 'Market.VIOP' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
+          grep -q 'Market.BIST' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
       - name: Build debug APK
         run: gradle assembleDebug --stacktrace
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BORSA-TAKIP-V4.0.1
+          name: BORSA-TAKIP-V4.0.3-FULL-BIST-VIOP-DEBUG
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
