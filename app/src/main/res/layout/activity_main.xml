@@ -4,13 +4,13 @@
     android:orientation="vertical" android:background="@color/bg">
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingTop="12dp" android:paddingBottom="10dp" android:gravity="center_vertical">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingStart="12dp" android:paddingEnd="12dp" android:paddingTop="8dp" android:paddingBottom="8dp" android:gravity="center_vertical">
             <TextView android:id="@+id/backButton" android:layout_width="40dp" android:layout_height="40dp" android:text="‹" android:textSize="36sp" android:textColor="@color/primary" android:gravity="center" android:visibility="gone"/>
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                <TextView android:id="@+id/titleText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BORSA TAKİP" android:textSize="23sp" android:textStyle="bold" android:textColor="@color/text_primary"/>
+                <TextView android:id="@+id/titleText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BORSA TAKİP" android:textSize="21sp" android:textStyle="bold" android:textColor="@color/text_primary"/>
                 <TextView android:id="@+id/subtitleText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="BIST • VİOP • FIRSAT" android:textColor="@color/text_secondary" android:textSize="13sp"/>
             </LinearLayout>
-            <TextView android:id="@+id/marketStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="● VERİ BEKLENİYOR" android:textColor="@color/yellow" android:textStyle="bold" android:textSize="11sp" android:padding="8dp"/>
+            <TextView android:id="@+id/marketStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="● VERİ BEKLENİYOR" android:textColor="@color/yellow" android:textStyle="bold" android:textSize="10sp" android:padding="6dp"/>
         </LinearLayout>
 
         <ScrollView android:id="@+id/homeScroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
@@ -20,15 +20,12 @@
                     <TextView android:id="@+id/summaryMarketText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BIST 100 • VİOP" android:textSize="12sp" android:textColor="@color/text_muted"/>
                 </LinearLayout>
                 <TextView android:id="@+id/summaryCard" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_surface" android:padding="14dp" android:text="BIST 100   —   |   VİOP   —\nPiyasa durumu: Veri bekleniyor" android:textColor="@color/text_primary" android:textSize="14sp"/>
-
                 <Button android:id="@+id/btnBist" android:layout_width="match_parent" android:layout_height="54dp" android:layout_marginTop="12dp" android:text="BIST TARA   ·   128 Hisse" android:textStyle="bold" android:textColor="@color/bist_blue" android:background="@drawable/bg_surface"/>
                 <TextView android:id="@+id/btnBistTitle" android:layout_width="0dp" android:layout_height="0dp"/>
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingStart="12dp" android:paddingTop="5dp" android:paddingBottom="5dp" android:text="LONG   —    BEKLE   —    SHORT   —    • Son tarama —" android:textColor="@color/text_secondary" android:textSize="11sp"/>
-
                 <Button android:id="@+id/btnViop" android:layout_width="match_parent" android:layout_height="54dp" android:layout_marginTop="5dp" android:text="VİOP TARA   ·   Kontratlar" android:textStyle="bold" android:textColor="@color/viop_purple" android:background="@drawable/bg_surface"/>
                 <TextView android:id="@+id/btnViopTitle" android:layout_width="0dp" android:layout_height="0dp"/>
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingStart="12dp" android:paddingTop="5dp" android:paddingBottom="5dp" android:text="GÜÇLÜ LONG   —   LONG   —   BEKLE   —   SHORT   —   GÜÇLÜ SHORT   —" android:textColor="@color/text_secondary" android:textSize="11sp"/>
-
                 <LinearLayout android:id="@+id/opportunityCard" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/bg_surface" android:padding="14dp" android:layout_marginTop="6dp">
                     <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="FIRSAT KONTROLÜ" android:textStyle="bold" android:textSize="17sp" android:textColor="@color/opportunity_orange"/>
                     <TextView android:id="@+id/opportunitySummary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="Henüz tarama yapılmadı • 0 fırsat" android:textColor="@color/text_secondary" android:textSize="12sp"/>
@@ -36,7 +33,6 @@
                     <Button android:id="@+id/btnOpportunity" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="8dp" android:text="⚡ FIRSAT KONTROL ET" android:textStyle="bold" android:textColor="@color/opportunity_orange" android:background="@drawable/bg_surface"/>
                     <TextView android:id="@+id/btnOpportunityTitle" android:layout_width="0dp" android:layout_height="0dp"/>
                 </LinearLayout>
-
                 <TextView android:id="@+id/watchCard" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:padding="10dp" android:text="FAVORİLERİM                                      TÜMÜNÜ GÖR ›" android:textStyle="bold" android:textColor="@color/text_primary" android:textSize="13sp" android:clickable="true" android:focusable="true"/>
                 <TextView android:id="@+id/favoritesPreview" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_surface" android:padding="12dp" android:text="Henüz favori eklenmedi.\nHisse eklemek için Takip Listem'e dokunun." android:textColor="@color/text_secondary" android:textSize="12sp"/>
                 <TextView android:id="@+id/noticeCard" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:padding="10dp" android:text="● Bildirimler" android:textColor="@color/text_primary" android:textSize="12sp"/>
@@ -59,8 +55,8 @@
             </LinearLayout>
         </ScrollView>
 
-        <LinearLayout android:id="@+id/contentPanel" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical" android:padding="16dp" android:visibility="gone">
-            <LinearLayout android:id="@+id/watchActionRow" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:visibility="gone"><Button android:id="@+id/addWatchButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="＋ HİSSE EKLE"/><Button android:id="@+id/clearWatchButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp" android:text="LİSTEYİ TEMİZLE"/></LinearLayout>
+        <LinearLayout android:id="@+id/contentPanel" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical" android:padding="12dp" android:visibility="gone">
+            <LinearLayout android:id="@+id/watchActionRow" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:visibility="gone"><Button android:id="@+id/addWatchButton" android:layout_width="0dp" android:layout_height="56dp" android:layout_weight="1" android:text="＋ HİSSE EKLE" android:textSize="14sp"/><Button android:id="@+id/clearWatchButton" android:layout_width="0dp" android:layout_height="56dp" android:layout_weight="1" android:layout_marginStart="8dp" android:text="LİSTEYİ TEMİZLE" android:textSize="14sp"/></LinearLayout>
             <LinearLayout android:id="@+id/watchListContainer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone"/>
             <TextView android:id="@+id/statusText" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="12dp" android:textColor="@color/text_primary"/>
             <ProgressBar android:id="@+id/progressBar" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="8dp"/>
