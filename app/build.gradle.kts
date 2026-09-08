@@ -11,8 +11,8 @@ android {
         applicationId = "tr.borsatakip.v3"
         minSdk = 26
         targetSdk = 35
-        versionCode = 40
-        versionName = "4.0.0"
+        versionCode = 41
+        versionName = "4.0.1"
         buildConfigField("String", "MARKET_API_BASE_URL", "\"\"")
     }
 

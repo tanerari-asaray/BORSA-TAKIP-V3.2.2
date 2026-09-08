@@ -28,6 +28,7 @@ class LiveBackendMarketDataProvider(private val context: Context) : MarketDataPr
                 setRequestProperty("Accept", "application/json")
                 setRequestProperty("Cache-Control", "no-cache")
                 setRequestProperty("Cache-Control", "no-cache")
+                setRequestProperty("Cache-Control", "no-cache")
                 if (apiKey.isNotBlank()) {
                     setRequestProperty("Authorization", "Bearer $apiKey")
                     setRequestProperty("X-API-Key", apiKey)
