@@ -5,6 +5,7 @@ s = main.read_text(encoding='utf-8')
 
 s = s.replace('private fun beginScanUi(button:ScanButton,title:String){adapter.submitList(emptyList());showContent();', 'private fun beginScanUi(button:ScanButton,title:String){showContent();')
 s = s.replace('private fun finishFailure(error:Throwable){adapter.submitList(emptyList());binding.progressBar.progress=0;', 'private fun finishFailure(error:Throwable){binding.progressBar.progress=0;')
+s = s.replace('import kotlinx.coroutines.Dispatchers\n', '').replace('import kotlinx.coroutines.withContext\n', '')
 s = s.replace('import kotlinx.coroutines.Job\n', 'import kotlinx.coroutines.Job\nimport kotlinx.coroutines.Dispatchers\nimport kotlinx.coroutines.withContext\n')
 s = s.replace('val all=result.items.mapNotNull(scoring::score); binding.statusText.text="ANALİZ EDİLİYOR...";', 'val all=withContext(Dispatchers.Default){result.items.mapNotNull(scoring::score)}; binding.statusText.text="ANALİZ EDİLİYOR...";')
 s = s.replace('val rows=b.items.mapNotNull(scoring::score); binding.progressBar.progress=80', 'val rows=withContext(Dispatchers.Default){b.items.mapNotNull(scoring::score)}; binding.progressBar.progress=80')
