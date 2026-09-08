@@ -11,9 +11,10 @@ android {
         applicationId = "tr.borsatakip.v3"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "3.2.2"
+        versionCode = 7
+        versionName = "3.2.7"
 
+        // Intentionally empty: the live API endpoint is entered in API AYARLARI.
         buildConfigField("String", "MARKET_API_BASE_URL", "\"\"")
     }
 
