@@ -2,4 +2,4 @@
 
 Referans 8 ekran tasarım sistemi, BIST/VİOP tarama yapısı ve üretim veri kontrolleri.
 
-APK build tetikleyicisi.
+APK build retry after shared-style compatibility fix.
