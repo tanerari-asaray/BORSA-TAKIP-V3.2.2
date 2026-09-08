@@ -11,8 +11,8 @@ android {
         applicationId = "tr.borsatakip.v3"
         minSdk = 26
         targetSdk = 35
-        versionCode = 41
-        versionName = "4.0.1"
+        versionCode = 42
+        versionName = "4.0.2"
         buildConfigField("String", "MARKET_API_BASE_URL", "\"\"")
     }
 
@@ -20,6 +20,9 @@ android {
         debug { }
         release {
             isMinifyEnabled = false
+            // Aynı debug anahtarıyla imzalanarak mevcut test kurulumunun üzerine güncellenebilir.
+            // Dağıtım mağazası için ayrı güvenli release keystore kullanılmalıdır.
+            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
