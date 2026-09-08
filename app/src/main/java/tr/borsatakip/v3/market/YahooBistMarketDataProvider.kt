@@ -15,14 +15,22 @@ import java.net.URL
 import java.net.URLEncoder
 
 /**
- * BIST geniş evreni için gerçek OHLCV verisi. Demo/sahte veri üretmez.
- * Yahoo'nun BIST (.IS) veri akışı piyasa verisi sağlayıcısı olarak kullanılır;
- * Yahoo'nun kendi yardım sayfasına göre Borsa İstanbul verisi en az 15 dakika gecikmelidir.
+ * BIST genis evreni icin gercek OHLCV verisi. Demo/sahte veri uretmez.
+ * Yahoo Finance Borsa Istanbul verisi 15 dk gecikmeli olabilir; canli kabul edilmez.
+ * Veri akisinin hizli olmasi icin kontrollu paralel indirme ve kisa sureli bellek onbellegi kullanilir.
  */
 class YahooBistMarketDataProvider(private val context: Context) {
-    private val timeoutMs = 8_000
+    private val timeoutMs = 5_000
+    private val parallelBatchSize = 24
+    private var memoryCache: MarketDataResult? = null
+    private var memoryCacheAt = 0L
+    private val cacheTtlMs = 20_000L
 
     suspend fun load(): Result<MarketDataResult> = withContext(Dispatchers.IO) {
+        val cached = memoryCache
+        if (cached != null && System.currentTimeMillis() - memoryCacheAt < cacheTtlMs) {
+            return@withContext Result.success(cached)
+        }
         runCatching {
             val watchlist = context.getSharedPreferences("watchlist", Context.MODE_PRIVATE)
                 .getStringSet("symbols", emptySet())
@@ -36,20 +44,25 @@ class YahooBistMarketDataProvider(private val context: Context) {
             val marketRegime = benchmark?.let { determineMarketRegime(it) }
 
             val stocks = coroutineScope {
-                symbols.chunked(12).flatMap { batch ->
-                    batch.map { symbol -> async { fetchStock(symbol) } }.awaitAll().filterNotNull()
+                symbols.chunked(parallelBatchSize).flatMap { batch ->
+                    batch.map { symbol -> async(Dispatchers.IO) { fetchStock(symbol) } }
+                        .awaitAll()
+                        .filterNotNull()
                 }
             }.map { stock ->
                 stock.copy(benchmarkReturn20d = benchmarkReturn20d, marketRegime = marketRegime)
             }
 
-            require(stocks.isNotEmpty()) { "BIST geniş evreni için geçerli veri döndürülmedi." }
-            MarketDataResult(
+            require(stocks.isNotEmpty()) { "BIST genis evreni icin gecerli veri dondurulmedi." }
+            val result = MarketDataResult(
                 items = stocks,
-                sourceName = "Yahoo Finance • BIST geniş evren + Takip Listesi",
+                sourceName = "Yahoo Finance • BIST genis evren + Takip Listesi",
                 dataTimestamp = stocks.maxOf { it.dataTimestamp },
                 isDemo = false
             )
+            memoryCache = result
+            memoryCacheAt = System.currentTimeMillis()
+            result
         }
     }
 
@@ -63,7 +76,6 @@ class YahooBistMarketDataProvider(private val context: Context) {
             connectTimeout = timeoutMs
             readTimeout = timeoutMs
             setRequestProperty("Accept", "application/json")
-            setRequestProperty("Cache-Control", "no-cache")
             setRequestProperty("User-Agent", "Mozilla/5.0 (Android) BorsaTakipV4/4.0.2")
         }
         return try {
