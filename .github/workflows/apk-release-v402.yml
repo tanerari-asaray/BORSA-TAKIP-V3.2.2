@@ -1,4 +1,4 @@
-name: APK V4.0.5 INSTALLABLE RELEASE
+name: APK V4.0.6 FULL REFERENCE UI RELEASE
 
 on:
   push:
@@ -26,8 +26,12 @@ jobs:
         run: python3 tools/apply_v402_completion.py
       - name: Apply V4.0.3 production fixes
         run: python3 tools/apply_v403_fixes.py
-      - name: Apply 8-screen reference UI
+      - name: Apply 8-screen reference palette and resources
         run: python3 tools/apply_v404_reference_ui.py
+      - name: Apply FULL 8-screen reference implementation
+        run: python3 tools/apply_v406_full_reference_ui.py
+      - name: Apply V4.0.6 compile cleanup
+        run: python3 tools/fix_v406_compile.py
       - name: Build release APK
         run: gradle clean assembleRelease --stacktrace
       - name: Align and sign APK with Android APK Signature Scheme
@@ -71,6 +75,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BORSA-TAKIP-V4.0.5-INSTALLABLE
+          name: BORSA-TAKIP-V4.0.6-FULL-REFERENCE-UI
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
