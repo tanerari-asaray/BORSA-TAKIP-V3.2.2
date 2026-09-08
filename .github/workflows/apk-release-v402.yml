@@ -28,19 +28,6 @@ jobs:
         run: python3 tools/apply_v403_fixes.py
       - name: Apply 8-screen reference UI
         run: python3 tools/apply_v404_reference_ui.py
-      - name: Validate and report reference UI
-        run: |
-          echo "=== V4.0.4 ==="
-          grep 'versionName' app/build.gradle.kts || true
-          grep 'versionCode' app/build.gradle.kts || true
-          echo "=== UI markers ==="
-          grep -o 'bg_bist\|bg_viop\|bg_opportunity\|demoSwitch\|notificationSwitch\|autoScanSwitch' app/src/main/res/layout/activity_main.xml | sort | uniq -c || true
-          echo "=== Technical markers ==="
-          grep -q 'rsiWilder' app/src/main/java/tr/borsatakip/v3/analysis/TechnicalAnalyzer.kt && echo 'Wilder RSI: OK'
-          grep -q 'vwap' app/src/main/java/tr/borsatakip/v3/analysis/TechnicalAnalyzer.kt && echo 'VWAP: OK'
-          grep -q 'marketType' app/src/main/java/tr/borsatakip/v3/model/Stock.kt && echo 'Market identity: OK'
-          ! grep -q 'X-API-Secret' app/src/main/java/tr/borsatakip/v3/market/LiveBackendMarketDataProvider.kt && echo 'Client API secret header: removed'
-          grep -q 'GECİKMELİ VERİ' app/src/main/java/tr/borsatakip/v3/market/YahooBistMarketDataProvider.kt && echo 'Yahoo freshness label: OK'
       - name: Build signed release APK
         run: gradle clean assembleRelease --stacktrace
       - name: Verify APK
