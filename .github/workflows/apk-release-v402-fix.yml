@@ -1,59 +1,10 @@
-name: BORSA TAKIP V4.0.4 REFERENCE UI RELEASE
+name: Legacy V4.0.4 Reference UI Build
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  build:
+  legacy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
-      - name: Generate current broad BIST universe
-        run: python3 tools/generate_bist_universe.py
-      - name: Complete V4 cleanup and release identity
-        run: python3 tools/apply_v402_completion.py
-      - name: Apply V4.0.3 production fixes
-        run: python3 tools/apply_v403_fixes.py
-      - name: Apply 8-screen reference UI
-        run: python3 tools/apply_v404_reference_ui.py
-      - name: Validate reference UI markers
-        run: |
-          grep 'versionName' app/build.gradle.kts
-          grep 'versionCode' app/build.gradle.kts
-          test -f app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
-          test ! -f app/src/main/java/tr/borsatakip/v3/MainActivityV2.kt
-          grep 'bg_bist' app/src/main/res/layout/activity_main.xml
-          grep 'bg_viop' app/src/main/res/layout/activity_main.xml
-          grep 'bg_opportunity' app/src/main/res/layout/activity_main.xml
-          grep 'demoSwitch' app/src/main/res/layout/activity_main.xml
-          grep 'notificationSwitch' app/src/main/res/layout/activity_main.xml
-          grep 'autoScanSwitch' app/src/main/res/layout/activity_main.xml
-          grep 'rsiWilder' app/src/main/java/tr/borsatakip/v3/analysis/TechnicalAnalyzer.kt
-          grep 'vwap' app/src/main/java/tr/borsatakip/v3/analysis/TechnicalAnalyzer.kt
-          grep 'marketType' app/src/main/java/tr/borsatakip/v3/model/Stock.kt
-          ! grep -q 'X-API-Secret' app/src/main/java/tr/borsatakip/v3/market/LiveBackendMarketDataProvider.kt
-          grep 'GECİKMELİ VERİ' app/src/main/java/tr/borsatakip/v3/market/YahooBistMarketDataProvider.kt
-      - name: Build signed release APK
-        run: gradle clean assembleRelease --stacktrace
-      - name: Verify APK
-        run: |
-          test -f app/build/outputs/apk/release/app-release.apk
-          jarsigner -verify app/build/outputs/apk/release/app-release.apk
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: BORSA-TAKIP-V4.0.4-REFERENCE-UI
-          path: app/build/outputs/apk/release/app-release.apk
-          if-no-files-found: error
+      - run: echo "Use apk-release-v402.yml for the active V4.0.4 build."
