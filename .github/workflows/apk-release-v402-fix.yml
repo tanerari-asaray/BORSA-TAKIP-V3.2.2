@@ -1,4 +1,4 @@
-name: APK V4.0.2 API Quick Access Fixed
+name: BORSA TAKIP V4.0.2 FINAL RELEASE
 
 on:
   push:
@@ -20,6 +20,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Generate current broad BIST universe
+        run: python3 tools/generate_bist_universe.py
       - name: Apply watchlist update
         run: python3 tools/apply_watchlist.py
       - name: Apply stock search update
@@ -32,11 +34,24 @@ jobs:
         run: python3 tools/apply_api_quick_access.py
       - name: Fix API quick access syntax
         run: python3 tools/fix_api_quick_access.py
-      - name: Build debug APK
-        run: gradle assembleDebug --stacktrace
+      - name: Complete V4 cleanup and release identity
+        run: python3 tools/apply_v402_completion.py
+      - name: Verify V4 release configuration
+        run: |
+          grep -q 'versionName = "4.0.2"' app/build.gradle.kts
+          grep -q 'versionCode = 42' app/build.gradle.kts
+          grep -q 'android:label="Borsa Takip V4"' app/src/main/AndroidManifest.xml
+          test -f app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
+          test ! -f app/src/main/java/tr/borsatakip/v3/MainActivityV2.kt
+      - name: Build signed release APK
+        run: gradle assembleRelease --stacktrace
+      - name: Verify APK
+        run: |
+          test -f app/build/outputs/apk/release/app-release.apk
+          jarsigner -verify app/build/outputs/apk/release/app-release.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BORSA-TAKIP-V4.0.2-API-ERISIM-FIX
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: BORSA-TAKIP-V4.0.2-FINAL-RELEASE
+          path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
