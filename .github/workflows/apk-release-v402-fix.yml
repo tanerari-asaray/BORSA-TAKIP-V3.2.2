@@ -34,6 +34,8 @@ jobs:
         run: python3 tools/apply_api_quick_access.py
       - name: Fix API quick access syntax
         run: python3 tools/fix_api_quick_access.py
+      - name: Fix API quick access on V4 launcher source
+        run: python3 tools/fix_api_quick_access_v4.py
       - name: Complete V4 cleanup and release identity
         run: python3 tools/apply_v402_completion.py
       - name: Verify V4 release configuration
@@ -43,6 +45,7 @@ jobs:
           grep -q 'android:label="Borsa Takip V4"' app/src/main/AndroidManifest.xml
           test -f app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
           test ! -f app/src/main/java/tr/borsatakip/v3/MainActivityV2.kt
+          grep -q 'apiQuickCard).setOnClickListener' app/src/main/java/tr/borsatakip/v3/MainActivityV4.kt
       - name: Build signed release APK
         run: gradle assembleRelease --stacktrace
       - name: Verify APK
