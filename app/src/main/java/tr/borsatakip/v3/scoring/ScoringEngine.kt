@@ -16,8 +16,8 @@ class ScoringEngine {
         val price = stock.candles.last().close
         if (!price.isFinite() || price <= 0.0) return null
 
-        val long = evaluateSide(stock, t, price, true)
-        val short = evaluateSide(stock, t, price, false)
+        val long = evaluateSide(stock, t, true)
+        val short = evaluateSide(stock, t, false)
         val useLong = long.total >= short.total
         val best = if (useLong) long else short
         val opposite = if (useLong) short else long
