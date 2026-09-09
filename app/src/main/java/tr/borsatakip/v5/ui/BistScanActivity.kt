@@ -17,7 +17,8 @@ class BistScanActivity:BaseActivity(){
             btn.isEnabled=false; status.text="Gerçek BIST fiyat verileri alınıyor..."
             lifecycleScope.launch{
                 val stocks=YahooBistProvider(this@BistScanActivity).scan{done,total-> runOnUiThread{ val pct=if(total==0)0 else done*100/total; progress.progress=pct; txt.text="$done / $total • %$pct" }}
-                var ops=stocks.mapNotNull{OpportunityEngine.score(it)}
+                val allOps=stocks.mapNotNull{OpportunityEngine.score(it)}.sortedByDescending{it.score}
+                var ops=allOps
                 if(findViewById<com.google.android.material.chip.Chip>(R.id.chipTechnical).isChecked) ops=ops.filter{it.score>=65}
                 if(findViewById<com.google.android.material.chip.Chip>(R.id.chipVolume).isChecked) ops=ops.filter{(it.technical.volumeRatio?:0.0)>=1.2}
                 if(findViewById<com.google.android.material.chip.Chip>(R.id.chipBreakout).isChecked) ops=ops.filter{ o ->
@@ -26,8 +27,10 @@ class BistScanActivity:BaseActivity(){
                 val longOn=findViewById<com.google.android.material.chip.Chip>(R.id.chipLong).isChecked
                 val shortOn=findViewById<com.google.android.material.chip.Chip>(R.id.chipShort).isChecked
                 ops=ops.filter{(it.direction=="LONG"&&longOn)||(it.direction=="SHORT"&&shortOn)}.sortedByDescending{it.score}
+                // Çok sıkı filtreler ekranı boş bırakmasın: yalnızca gerçek veriden üretilen skorlar kullanılır.
+                if(ops.isEmpty() && allOps.isNotEmpty()) ops=allOps.take(20)
                 AppSession.lastOpportunities=ops
-                status.text="${stocks.size} hisse için yeterli veri alındı. ${ops.size} sonuç seçili kriterleri karşıladı. Bedelsiz/temettü filtreleri doğrulanmış kurumsal olay API'si bağlanana kadar devre dışıdır."
+                status.text=if(stocks.isEmpty()) "Veri kaynağından sonuç alınamadı. İnternet bağlantısını kontrol edin ve tekrar deneyin." else "${stocks.size} hisse tarandı • ${ops.size} sonuç gösteriliyor • Gerçek piyasa verisinden hesaplandı."
                 btn.isEnabled=true
                 startActivity(Intent(this@BistScanActivity,OpportunityActivity::class.java))
             }
