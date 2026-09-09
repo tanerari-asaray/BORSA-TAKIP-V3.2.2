@@ -24,15 +24,30 @@ class YahooBistProvider(private val context:Context){
         return try { context.assets.open("bist_symbols.txt").bufferedReader().readLines().map{it.trim().uppercase()}.filter{it.matches(Regex("[A-Z0-9]{3,7}"))}.distinct().ifEmpty{BistUniverse.fallback} } catch(_:Exception){ BistUniverse.fallback }
     }
     private fun fetch(symbol:String):Stock?{
-        val y=URLEncoder.encode("$symbol.IS","UTF-8"); val con=(URL("https://query1.finance.yahoo.com/v8/finance/chart/$y?range=1y&interval=1d&events=history").openConnection() as HttpURLConnection)
-        con.connectTimeout=7000; con.readTimeout=7000; con.setRequestProperty("User-Agent","Mozilla/5.0 BorsaTakip/5.0")
-        return try{ if(con.responseCode !in 200..299)return null; parse(con.inputStream.bufferedReader().use{it.readText()},symbol) }catch(_:Exception){null}finally{con.disconnect()}
+        val y=URLEncoder.encode("$symbol.IS","UTF-8")
+        val urls=listOf(
+            "https://query1.finance.yahoo.com/v8/finance/chart/$y?range=1y&interval=1d&events=history",
+            "https://query2.finance.yahoo.com/v8/finance/chart/$y?range=1y&interval=1d&events=history"
+        )
+        for (endpoint in urls) {
+            val con=(URL(endpoint).openConnection() as HttpURLConnection)
+            con.connectTimeout=10000; con.readTimeout=10000
+            con.setRequestProperty("User-Agent","Mozilla/5.0 (Android) BorsaTakip/5.0.1")
+            con.setRequestProperty("Accept","application/json")
+            try {
+                if(con.responseCode in 200..299){
+                    val parsed=parse(con.inputStream.bufferedReader().use{it.readText()},symbol)
+                    if(parsed!=null) return parsed
+                }
+            } catch(_:Exception) { } finally { con.disconnect() }
+        }
+        return null
     }
     private fun parse(json:String,fallback:String):Stock?{
         val r=JSONObject(json).optJSONObject("chart")?.optJSONArray("result")?.optJSONObject(0)?:return null
         val ts=r.optJSONArray("timestamp")?:return null; val q=r.optJSONObject("indicators")?.optJSONArray("quote")?.optJSONObject(0)?:return null
         val o=q.optJSONArray("open")?:return null; val h=q.optJSONArray("high")?:return null; val l=q.optJSONArray("low")?:return null; val c=q.optJSONArray("close")?:return null; val v=q.optJSONArray("volume")?:return null
         val candles=mutableListOf<Candle>(); for(i in 0 until ts.length()){ if(o.isNull(i)||h.isNull(i)||l.isNull(i)||c.isNull(i)||v.isNull(i))continue; candles+=Candle(ts.getLong(i)*1000,o.getDouble(i),h.getDouble(i),l.getDouble(i),c.getDouble(i),v.getDouble(i)) }
-        if(candles.size<220)return null; val m=r.optJSONObject("meta"); return Stock(fallback,m?.optString("longName")?.takeIf{it.isNotBlank()},candles,"Yahoo Finance • gecikmeli olabilir",candles.last().timestamp)
+        if(candles.size<180)return null; val m=r.optJSONObject("meta"); return Stock(fallback,m?.optString("longName")?.takeIf{it.isNotBlank()},candles,"Yahoo Finance • gecikmeli olabilir",candles.last().timestamp)
     }
 }
