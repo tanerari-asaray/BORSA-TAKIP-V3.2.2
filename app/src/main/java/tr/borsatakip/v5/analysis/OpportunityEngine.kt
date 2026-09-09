@@ -4,7 +4,7 @@ import tr.borsatakip.v5.model.*
 
 object OpportunityEngine {
     fun score(stock:Stock, kapLabel:String="Veri yok"):Opportunity?{
-        if(stock.candles.size<220)return null
+        if(stock.candles.size<180)return null
         val t=TechnicalAnalyzer.analyze(stock.candles); val c=stock.candles; val price=c.last().close; val prev=c[c.lastIndex-1].close
         var long=0.0; var short=0.0
         if(t.ema20!=null && t.ema50!=null && t.ema200!=null){
