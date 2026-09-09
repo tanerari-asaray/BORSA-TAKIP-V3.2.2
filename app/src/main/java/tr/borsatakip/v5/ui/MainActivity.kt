@@ -8,8 +8,9 @@ import tr.borsatakip.v5.R
 
 class MainActivity:BaseActivity(){
     override fun onCreate(savedInstanceState:Bundle?){ super.onCreate(savedInstanceState); setContentView(R.layout.activity_main); setupBottomNav()
+        // BIST TARA ve FIRSAT KONTROLÜ aynı tarama/listenin girişidir.
         findViewById<Button>(R.id.btnBist).setOnClickListener{startActivity(Intent(this,BistScanActivity::class.java))}
-        findViewById<Button>(R.id.btnOpportunity).setOnClickListener{startActivity(Intent(this,OpportunityActivity::class.java))}
+        findViewById<Button>(R.id.btnOpportunity).setOnClickListener{startActivity(Intent(this,BistScanActivity::class.java))}
         findViewById<Button>(R.id.btnViop).setOnClickListener{startActivity(Intent(this,ViopActivity::class.java))}
         findViewById<Button>(R.id.btnFav).setOnClickListener{startActivity(Intent(this,FavoritesActivity::class.java))}
         findViewById<Button>(R.id.btnNotifications).setOnClickListener{startActivity(Intent(this,SettingsActivity::class.java))}
