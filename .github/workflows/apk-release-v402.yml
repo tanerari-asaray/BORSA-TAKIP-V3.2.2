@@ -32,6 +32,8 @@ jobs:
         run: python3 tools/apply_v406_full_reference_ui.py
       - name: Apply V4.0.6 compile cleanup
         run: python3 tools/fix_v406_compile.py
+      - name: Apply final V4.0.6 Kotlin syntax fixes
+        run: python3 tools/fix_v406_syntax.py
       - name: Build release APK
         run: gradle clean assembleRelease --stacktrace
       - name: Align and sign APK with Android APK Signature Scheme
