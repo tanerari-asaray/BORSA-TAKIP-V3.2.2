@@ -1,1 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?><LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@color/bg"><TextView android:id="@+id/txtSummary" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="18dp" android:textColor="@color/text_primary"/><androidx.recyclerview.widget.RecyclerView android:id="@+id/list" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:padding="12dp"/></LinearLayout>
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/bg_screen_gradient">
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="14dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:text="BorsaTakip" android:textColor="@color/blue" android:textStyle="bold" android:textSize="13sp" android:letterSpacing="0.04"/>
+                    <TextView style="@style/Title" android:text="Fırsat Kontrol" android:layout_marginTop="2dp"/>
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="36dp" android:gravity="center" android:paddingHorizontal="12dp" android:background="@drawable/bg_card_purple" android:text="VİOP  ›" android:textColor="@color/white" android:textStyle="bold" android:textSize="11sp"/>
+            </LinearLayout>
+            <TextView android:id="@+id/txtSummary" style="@style/Sub" android:layout_width="match_parent" android:layout_marginTop="5dp" android:text="Tarama durumu hazırlanıyor..."/>
+            <TextView android:id="@+id/txtLastScanCard" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp" android:background="@drawable/bg_card" android:padding="11dp" android:text="SON TARAMA • veri yok" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="10dp">
+                <Button android:id="@+id/btnFilterAll" style="@style/FilterButton" android:text="TÜMÜ" android:textColor="@color/blue" android:layout_marginEnd="3dp"/>
+                <Button android:id="@+id/btnFilterLong" style="@style/FilterButton" android:text="LONG" android:textColor="@color/green" android:layout_marginHorizontal="3dp"/>
+                <Button android:id="@+id/btnFilterShort" style="@style/FilterButton" android:text="SHORT" android:textColor="@color/red" android:layout_marginHorizontal="3dp"/>
+                <Button android:id="@+id/btnFilterHighPower" style="@style/FilterButton" android:text="85+" android:textColor="@color/yellow" android:layout_marginStart="3dp"/>
+            </LinearLayout>
+            <Button android:id="@+id/btnRealOpportunityScan" android:layout_width="match_parent" android:layout_height="52dp" android:layout_marginTop="9dp" android:background="@drawable/bg_card_blue" android:text="▶  FIRSAT TARAMASINI BAŞLAT" android:textColor="@color/white" android:textStyle="bold" android:textSize="12sp"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="8dp">
+                <Button android:id="@+id/btnSignalHistory" android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:background="@drawable/bg_card_purple" android:text="SİNYAL GEÇMİŞİ  ›" android:textColor="@color/white" android:textSize="11sp" android:textStyle="bold"/>
+                <Button android:id="@+id/btnForwardTest" android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1" android:layout_marginStart="4dp" android:background="@drawable/bg_card_purple" android:text="FORWARD  ›" android:textColor="@color/white" android:textSize="11sp" android:textStyle="bold"/>
+            </LinearLayout>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="13dp" android:text="FIRSAT LİSTESİ" android:textColor="@color/blue" android:textStyle="bold" android:textSize="12sp"/>
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/list" android:layout_width="match_parent" android:layout_height="wrap_content" android:nestedScrollingEnabled="false" android:clipToPadding="false" android:paddingTop="6dp" android:paddingBottom="8dp"/>
+        </LinearLayout>
+    </ScrollView>
+    <include layout="@layout/include_bottom_nav" />
+</LinearLayout>
