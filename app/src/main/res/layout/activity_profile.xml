@@ -2,18 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/bg_screen_gradient">
 <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true"><LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="14dp">
 <TextView android:text="BorsaTakip" android:textColor="@color/blue" android:textStyle="bold" android:textSize="13sp"/>
-<TextView style="@style/Title" android:text="Profil / Diğer" android:layout_marginTop="2dp"/>
+<TextView style="@style/Title" android:text="Profil / Diger" android:layout_marginTop="2dp"/>
 <TextView android:id="@+id/profileInfo" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp" android:background="@drawable/bg_card" android:padding="13dp" android:textColor="@color/text_primary" android:textSize="12sp" android:lineSpacingExtra="4dp"/>
 <TextView android:id="@+id/profileApi" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="7dp" android:background="@drawable/bg_card_blue" android:padding="12dp" android:textColor="@color/white" android:textSize="12sp" android:textStyle="bold"/>
 <TextView android:id="@+id/profileProvider" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:background="@drawable/bg_card" android:padding="11dp" android:textColor="@color/text_secondary" android:textSize="10sp"/>
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="13dp" android:text="HIZLI MENÜ" android:textColor="@color/blue" android:textStyle="bold" android:textSize="12sp"/>
-<Button android:id="@+id/profileFavorites" style="@style/CardButton" android:layout_marginTop="7dp" android:background="@drawable/bg_card" android:text="★  FAVORİLERİM  ›"/>
-<Button android:id="@+id/profileNotifications" style="@style/CardButton" android:background="@drawable/bg_card_purple" android:text="●  ALARM VE BİLDİRİMLER  ›"/>
-<Button android:id="@+id/profileSettings" style="@style/CardButton" android:background="@drawable/bg_card_blue" android:text="⚙  API DURUMU / AYARLAR  ›"/>
-<Button android:id="@+id/profileAbout" style="@style/CardButton" android:background="@drawable/bg_card" android:text="ⓘ  UYGULAMA HAKKINDA  ›"/>
-<Button android:id="@+id/profileHelp" style="@style/CardButton" android:background="@drawable/bg_card" android:text="?  YARDIM VE DESTEK  ›"/>
-<Button android:id="@+id/profileFeedback" style="@style/CardButton" android:background="@drawable/bg_card" android:text="✎  GERİ BİLDİRİM  ›"/>
-<Button android:id="@+id/profileExit" style="@style/CardButton" android:layout_marginTop="2dp" android:background="@drawable/bg_card_red" android:text="ÇIKIŞ YAP" android:textColor="@color/white"/>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="13dp" android:text="HIZLI MENU" android:textColor="@color/blue" android:textStyle="bold" android:textSize="12sp"/>
+<Button android:id="@+id/profileFavorites" style="@style/CardButton" android:layout_marginTop="7dp" android:background="@drawable/bg_card" android:text="FAVORILERIM"/>
+<Button android:id="@+id/profileNotifications" style="@style/CardButton" android:background="@drawable/bg_card_purple" android:text="ALARM VE BILDIRIMLER"/>
+<Button android:id="@+id/profileSettings" style="@style/CardButton" android:background="@drawable/bg_card_blue" android:text="API DURUMU / AYARLAR"/>
+<Button android:id="@+id/profileAbout" style="@style/CardButton" android:background="@drawable/bg_card" android:text="UYGULAMA HAKKINDA"/>
+<Button android:id="@+id/profileHelp" style="@style/CardButton" android:background="@drawable/bg_card" android:text="YARDIM VE DESTEK"/>
+<Button android:id="@+id/profileFeedback" style="@style/CardButton" android:background="@drawable/bg_card" android:text="GERI BILDIRIM"/>
+<Button android:id="@+id/profileExit" style="@style/CardButton" android:layout_marginTop="2dp" android:background="@drawable/bg_card_red" android:text="CIKIS YAP" android:textColor="@color/white"/>
 <TextView android:id="@+id/profileSupportInfo" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:background="@drawable/bg_card" android:padding="10dp" android:textColor="@color/text_muted" android:textSize="10sp"/>
 </LinearLayout></ScrollView><include layout="@layout/include_bottom_nav"/>
 </LinearLayout>
