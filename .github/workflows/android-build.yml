@@ -10,6 +10,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Normalize transferred XML resources
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          for p in Path('app/src/main/res/layout').glob('*.xml'):
+              raw = p.read_text(encoding='utf-8-sig')
+              s = raw.lstrip()
+              if s.startswith('{'):
+                  try:
+                      obj = json.loads(raw)
+                      content = obj.get('content')
+                      if isinstance(content, str) and content.lstrip().startswith('<?xml'):
+                          p.write_text(content, encoding='utf-8')
+                          print(f'Unwrapped {p}')
+                  except Exception as e:
+                      print(f'Could not unwrap {p}: {e}')
+      - name: Validate XML resources
+        shell: python
+        run: |
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          for p in Path('app/src/main/res/layout').glob('*.xml'):
+              ET.parse(p)
+          print('All layout XML files are valid.')
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
