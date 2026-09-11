@@ -17,16 +17,13 @@ jobs:
           from pathlib import Path
           for p in Path('app/src/main/res/layout').glob('*.xml'):
               raw = p.read_text(encoding='utf-8-sig')
-              s = raw.lstrip()
-              if s.startswith('{'):
-                  try:
-                      obj = json.loads(raw)
-                      content = obj.get('content')
-                      if isinstance(content, str) and content.lstrip().startswith('<?xml'):
-                          p.write_text(content, encoding='utf-8')
-                          print(f'Unwrapped {p}')
-                  except Exception as e:
-                      print(f'Could not unwrap {p}: {e}')
+              if raw.lstrip().startswith('{'):
+                  obj = json.loads(raw)
+                  content = obj.get('content')
+                  if not isinstance(content, str):
+                      raise RuntimeError(f'Missing content in {p}')
+                  p.write_text(content.lstrip('\ufeff'), encoding='utf-8')
+                  print(f'Unwrapped {p}')
       - name: Validate XML resources
         shell: python
         run: |
