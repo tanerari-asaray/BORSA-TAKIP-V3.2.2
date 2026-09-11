@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - v5.1.28-screen-update
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
