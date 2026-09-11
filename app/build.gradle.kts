@@ -6,12 +6,27 @@ plugins {
 android {
     namespace = "tr.borsatakip.v5"
     compileSdk = 35
-    defaultConfig { applicationId = "tr.borsatakip.v5"; minSdk = 26; targetSdk = 35; versionCode = 50; versionName = "5.0.0" }
-    buildTypes { release { isMinifyEnabled = false; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro") } }
-    compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
+    defaultConfig {
+        applicationId = "tr.borsatakip.v5"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 78
+        versionName = "5.1.28"
+    }
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { viewBinding = true; buildConfig = true }
 }
+
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
